@@ -31,26 +31,25 @@ def produce(queue_url: str, n_msg: int = 10, sleep_time: int = 1) -> None:
 
 def consume(queue_url: str, n_msg: int = 5) -> None:
     sqs = boto3.client('sqs')
-    response = sqs.receive_message(
-        QueueUrl=queue_url,
-        AttributeNames=['SentTimestamp'],
-        MaxNumberOfMessages=n_msg,
-        MessageAttributeNames=['All'],
-        VisibilityTimeout=0,
-        WaitTimeSeconds=0
-    )
-    message = response['Messages'][0]
-    receipt_handle = message['ReceiptHandle']
-    sqs.delete_message(
-        QueueUrl=queue_url,
-        ReceiptHandle=receipt_handle
-    )
-    sent_time = int(message['Attributes']['SentTimestamp'])
-    print("New Message!")
-    print(f"├── ID: {message['MessageId']}")
-    print(f"├── Sent Timestamp: {mock.format_date(datetime.fromtimestamp(sent_time / 1000))} ({sent_time}) ")
-    print(f"├── Author: {message['MessageAttributes']['Author']['StringValue']}")
-    print(f"└── Content: {message['Body']}\n")
+    while True:
+        response = sqs.receive_message(
+            QueueUrl=queue_url,
+            AttributeNames=['SentTimestamp'],
+            MaxNumberOfMessages=n_msg,
+            MessageAttributeNames=['All'],
+        )
+        if not response or 'Messages' not in response:
+            break
+
+        for message in response['Messages']:
+            sent_time = int(message['Attributes']['SentTimestamp'])
+            print("New Message!")
+            print(f"├── ID: {message['MessageId']}")
+            print(f"├── Sent Timestamp: {mock.format_date(datetime.fromtimestamp(sent_time / 1000))} ({sent_time}) ")
+            print(f"├── Author: {message.get('MessageAttributes', 'none')}")
+            print(f"└── Content: {message['Body']}\n")
+            sqs.delete_message(QueueUrl=queue_url, ReceiptHandle=message['ReceiptHandle'])
+        sleep(5)
 
 
 if __name__ == "__main__":
