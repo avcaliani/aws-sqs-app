@@ -25,21 +25,22 @@ poetry install
 ```bash
 cd terraform
 terraform init
-terraform workspace new dev-aws-sqs-app
+terraform workspace new dev-aws-queue-app
 terraform apply
 ```
 
 ## 😎 SQS Producer and Consumer
 
 ```bash
-python main.py produce \
+python app/sqs.py produce \
   --queue-url "https://sqs.<AWS_REGION>.amazonaws.com/<AWS_ACC_ID>/<QUEUE_NAME>" \
   --n-msg 5
 ```
 
 ```bash
-python main.py consume \
-  --queue-url "https://sqs.<AWS_REGION>.amazonaws.com/<AWS_ACC_ID>/<QUEUE_NAME>"
+python app/sqs.py consume \
+  --queue-url "https://sqs.<AWS_REGION>.amazonaws.com/<AWS_ACC_ID>/<QUEUE_NAME>" \
+  --n-msg 5
 ```
 
 ### References

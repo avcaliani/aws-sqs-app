@@ -40,12 +40,12 @@ def produce(queue_url: str, n_msg: int = 10, sleep_time: int = 1) -> None:
         sleep(sleep_time)
 
 
-def consume(queue_url: str):
+def consume(queue_url: str, n_msg: int = 5) -> None:
     sqs = boto3.client('sqs')
     response = sqs.receive_message(
         QueueUrl=queue_url,
         AttributeNames=['SentTimestamp'],
-        MaxNumberOfMessages=1,
+        MaxNumberOfMessages=n_msg,
         MessageAttributeNames=['All'],
         VisibilityTimeout=0,
         WaitTimeSeconds=0
