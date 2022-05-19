@@ -33,9 +33,15 @@ provider "aws" {
 }
 
 resource "aws_sqs_queue" "player_score_queue" {
-  name                      = format("%s%s", local.workspace.player_score_queue_name, local.workspace.suffix)
-  delay_seconds             = 90
-  max_message_size          = 2048
-  message_retention_seconds = 86400
-  receive_wait_time_seconds = 10
+  name = format("%s%s", "player-score-queue", local.workspace.suffix)
+}
+
+resource "aws_sns_topic" "player_score_topic" {
+  name = format("%s%s", "player-score-topic", local.workspace.suffix)
+}
+
+resource "aws_sns_topic_subscription" "player_score_topic_sub" {
+  topic_arn = aws_sns_topic.player_score_topic.arn
+  protocol  = "sqs"
+  endpoint  = aws_sqs_queue.player_score_queue.arn
 }

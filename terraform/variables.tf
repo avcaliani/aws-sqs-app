@@ -4,7 +4,6 @@ locals {
   project_name = replace(terraform.workspace, "/^(prd|dev)-/", "")
   workspace    = {
     suffix = local.environment != "prd" ? format("-%s", local.environment) : ""
-    player_score_queue_name =  "player-score"
   }
 }
 
